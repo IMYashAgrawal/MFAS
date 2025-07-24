@@ -167,6 +167,14 @@ def welcome():
     """The success page after passing both authentication factors."""
     return render_template('welcome.html')
 
+# --- THIS IS THE MISSING LOGOUT ROUTE ---
+@app.route('/logout', methods=['POST'])
+def logout():
+    """Clears the session and logs the user out."""
+    session.clear()
+    flash("You have been successfully logged out.", "success")
+    return redirect(url_for('login'))
+
 @app.route('/chain')
 def get_chain():
     """An endpoint for developers to view the entire blockchain."""
