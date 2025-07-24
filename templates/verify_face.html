@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Face</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+    <div class="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg text-center">
+        <h1 class="text-3xl font-bold text-gray-800">Face Verification</h1>
+        <p class="text-gray-500 mt-2 mb-6">Please look at the camera to log in.</p>
+        
+        <video id="video" width="640" height="480" autoplay class="rounded-lg mx-auto bg-gray-900"></video>
+        <canvas id="canvas" width="640" height="480" class="hidden"></canvas>
+
+        <button id="capture" class="mt-6 w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
+            Verify My Face
+        </button>
+
+        <form id="verify-form" action="{{ url_for('check_face') }}" method="POST" class="hidden">
+            <input type="hidden" name="email_hash" value="{{ email_hash }}">
+            <input type="hidden" id="face_data" name="face_data">
+        </form>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture');
+        const verifyForm = document.getElementById('verify-form');
+        const faceDataInput = document.getElementById('face_data');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing webcam: ", err);
+                alert("Could not access webcam. Please allow camera permissions.");
+            });
+
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, 640, 480);
+            
+            const dataURL = canvas.toDataURL('image/jpeg');
+            faceDataInput.value = dataURL;
+
+            verifyForm.submit();
+        });
+    </script>
+</body>
+</html>
