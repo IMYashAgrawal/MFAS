@@ -1,0 +1,22 @@
+[
+    {
+        "index": 1,
+        "timestamp": 1753359686.474912,
+        "transactions": [],
+        "proof": 100,
+        "previous_hash": "1"
+    },
+    {
+        "index": 2,
+        "timestamp": 1753359738.5870724,
+        "transactions": [
+            {
+                "event": "user_registration",
+                "user_email_hash": "3f971627007559b49bf7b45c6a0f89bfaad4fe48544c0948cd65f1a9bac3cbbd",
+                "timestamp": 1753359738.5870724
+            }
+        ],
+        "proof": 12345,
+        "previous_hash": "6eaccf0423a73be3d10b2c162934dd30a850843a3628de9e8799ab574af9f22b"
+    }
+]
