@@ -30,8 +30,6 @@
         const captureButton = document.getElementById('capture');
         const enrollForm = document.getElementById('enroll-form');
         const faceDataInput = document.getElementById('face_data');
-
-        // Access the webcam
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 video.srcObject = stream;
@@ -40,17 +38,11 @@
                 console.error("Error accessing webcam: ", err);
                 alert("Could not access webcam. Please allow camera permissions.");
             });
-
-        // Capture photo and submit form
         captureButton.addEventListener('click', () => {
             const context = canvas.getContext('2d');
             context.drawImage(video, 0, 0, 640, 480);
-            
-            // Convert the canvas image to a Base64 string
             const dataURL = canvas.toDataURL('image/jpeg');
             faceDataInput.value = dataURL;
-
-            // Submit the form
             enrollForm.submit();
         });
     </script>

@@ -1,10 +1,8 @@
-# blockchain_utils.py
-
 import hashlib
 import json
 from time import time
 import os
-import bcrypt # For hashing and checking passwords
+import bcrypt
 
 BLOCKCHAIN_FILE = 'blockchain.json'
 
@@ -36,6 +34,7 @@ class Blockchain:
             print(f"Could not save blockchain to file: {e}")
 
     def new_block(self, proof, previous_hash=None):
+        
         block = {
             'index': len(self.chain) + 1,
             'timestamp': time(),
@@ -48,21 +47,17 @@ class Blockchain:
         self.save_chain()
         return block
 
-    # --- MODIFIED: Now accepts hashed_password ---
     def new_transaction(self, user_email_hash, hashed_password, face_data):
-        """
-        Adds a new registration transaction, including hashed password and face data.
-        """
+        
         self.current_transactions.append({
             'event': 'user_registration',
             'user_email_hash': user_email_hash,
-            'password_hash': hashed_password.decode('utf-8'), # Store the hashed password as a string
+            'password_hash': hashed_password.decode('utf-8'), 
             'face_data_b64': face_data,
             'timestamp': time(),
         })
-        # Use last_block's index if chain is not empty, otherwise return 1
+        
         return (self.last_block['index'] + 1) if self.last_block else 1
-
 
     @staticmethod
     def hash(block):
@@ -74,9 +69,7 @@ class Blockchain:
         return self.chain[-1] if self.chain else None
 
     def find_transaction(self, user_email_hash):
-        """
-        Searches the blockchain for a transaction and returns it if found.
-        """
+        
         for block in reversed(self.chain):
             for transaction in block['transactions']:
                 if transaction['user_email_hash'] == user_email_hash:
