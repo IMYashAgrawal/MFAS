@@ -8,6 +8,7 @@ from deepface import DeepFace
 import bcrypt
 
 from blockchain_utils import Blockchain, hash_email
+from crypto_utils import encrypt, decrypt
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -16,14 +17,14 @@ blockchain = Blockchain()
 def load_image_from_b64(b64_string):
     img_data = base64.b64decode(b64_string.split(',')[1])
     img = Image.open(io.BytesIO(img_data))
-    return np.array(img)[:, :, ::-1] 
+    return np.array(img)[:, :, ::-1]
 
 @app.route('/')
 def index():
     return redirect(url_for('signup'))
 
 @app.route('/signup', methods=['GET', 'POST'])
-def signup(): 
+def signup():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -63,10 +64,12 @@ def save_face():
         flash("Session data is missing. Please try the signup process again.", "danger")
         return redirect(url_for('signup'))
 
+    encrypted_face_data = encrypt(face_data.encode('utf-8'))
+
     blockchain.new_transaction(
-        user_email_hash=email_hash, 
-        hashed_password=password_hash.encode('utf-8'), 
-        face_data=face_data
+        user_email_hash=email_hash,
+        hashed_password=password_hash.encode('utf-8'),
+        encrypted_face_data=encrypted_face_data
     )
 
     blockchain.new_block(proof=12345, previous_hash=blockchain.hash(blockchain.last_block))
@@ -119,11 +122,14 @@ def check_face():
         return redirect(url_for('login'))
 
     try:
+        encrypted_stored_face = transaction['encrypted_face_data']
+        decrypted_stored_face_bytes = decrypt(encrypted_stored_face)
+        decrypted_stored_face_b64 = decrypted_stored_face_bytes.decode('utf-8')
 
         result = DeepFace.verify(
-            img1_path = transaction['face_data_b64'], 
-            img2_path = live_face_data_b64,
-            enforce_detection=False 
+            img1_path=decrypted_stored_face_b64,
+            img2_path=live_face_data_b64,
+            enforce_detection=False
         )
 
         session.pop('verifying_email_hash', None)

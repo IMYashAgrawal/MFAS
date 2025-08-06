@@ -34,7 +34,6 @@ class Blockchain:
             print(f"Could not save blockchain to file: {e}")
 
     def new_block(self, proof, previous_hash=None):
-        
         block = {
             'index': len(self.chain) + 1,
             'timestamp': time(),
@@ -47,16 +46,14 @@ class Blockchain:
         self.save_chain()
         return block
 
-    def new_transaction(self, user_email_hash, hashed_password, face_data):
-        
+    def new_transaction(self, user_email_hash, hashed_password, encrypted_face_data):
         self.current_transactions.append({
             'event': 'user_registration',
             'user_email_hash': user_email_hash,
-            'password_hash': hashed_password.decode('utf-8'), 
-            'face_data_b64': face_data,
+            'password_hash': hashed_password.decode('utf-8'),
+            'encrypted_face_data': encrypted_face_data,
             'timestamp': time(),
         })
-        
         return (self.last_block['index'] + 1) if self.last_block else 1
 
     @staticmethod
@@ -69,10 +66,9 @@ class Blockchain:
         return self.chain[-1] if self.chain else None
 
     def find_transaction(self, user_email_hash):
-        
         for block in reversed(self.chain):
             for transaction in block['transactions']:
-                if transaction['user_email_hash'] == user_email_hash:
+                if transaction.get('user_email_hash') == user_email_hash:
                     return transaction
         return None
 
